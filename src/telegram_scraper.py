@@ -35,13 +35,17 @@ def get_data_lake_paths(base_path: Path, channel_identifier: str, msg_date: date
     # Path for JSON data
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     json_path = os.path.join(project_root, 'data', 'raw', 'telegram_messages' , date_str)
-    json_path.mkdir(parents=True, exist_ok=True)
-    json_file = json_path / f"{channel_identifier}.jsonl" # Using .jsonl for line-delimited JSON
+
+    os.makedirs(os.path.dirname(json_path), exist_ok=True)
+
+    json_file = os.path.join(json_path, f'{channel_identifier}.jsonl')
+    os.makedirs(os.path.dirname(json_file), exist_ok=True)
+    #json_file = json_path / f"{channel_identifier}.jsonl" # Using .jsonl for line-delimited JSON
 
     # Path for images
-    image_path = base_path / "raw" / "images" / date_str / channel_identifier
-    image_path.mkdir(parents=True, exist_ok=True)
-    
+    image_path = os.path.join(base_path, 'raw', 'images', date_str, channel_identifier)
+    os.makedirs(os.path.dirname(image_path), exist_ok=True)
+
     return json_file, image_path
 
 # --- 3. Core Scraping Logic ---
@@ -98,9 +102,10 @@ async def main():
     # Define the absolute path to the project's root directory
     # This makes the script runnable from anywhere
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    data_lake_base_path = project_root / "data"
+    data_lake_base_path = os.path.join(project_root, 'data')
+    #data_lake_base_path = project_root / "data"
 
-    print(f"Data lake will be populated at: {data_lake_base_path.absolute()}")
+    print(f"Data lake will be populated at: {data_lake_base_path}")
 
     # List of channels to scrape
     channels_to_scrape = [
