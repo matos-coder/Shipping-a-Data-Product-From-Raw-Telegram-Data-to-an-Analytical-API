@@ -5,11 +5,12 @@ from pathlib import Path
 import psycopg2
 from dotenv import load_dotenv
 
+load_dotenv()
 # Database connection details from .env file
 DB_NAME = os.getenv("POSTGRES_DB")
 DB_USER = os.getenv("POSTGRES_USER")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-DB_HOST = "db"  # 'localhost' Or "db"if running this script inside a Docker container
+DB_HOST = "localhost"  # 'localhost' Or "db"if running this script inside a Docker container
 DB_PORT = "5432"
 
 def create_raw_table(conn):
