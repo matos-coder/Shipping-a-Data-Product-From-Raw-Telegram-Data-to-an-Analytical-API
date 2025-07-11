@@ -111,7 +111,6 @@ async def main():
     channels_to_scrape = [
         "https://t.me/lobelia4cosmetics",
         "https://t.me/tikvahpharma",
-        # You can add more from https://et.tgstat.com/medicine [cite: 78]
     ]
 
     async with TelegramClient('scraping_session', TELEGRAM_APP_ID, TELEGRAM_API_HASH) as client:
