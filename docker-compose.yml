@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  # This is your Python service from Task 0
+  app:
+    build: .
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db # Makes sure the database starts before your app
+
+  # Add this new service for the database
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    restart: always
+    env_file:
+      - .env # Use the .env file for credentials
+    ports:
+      - "5432:5432" # Expose the port to connect from your machine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: # This persists your database data even if the container stops
