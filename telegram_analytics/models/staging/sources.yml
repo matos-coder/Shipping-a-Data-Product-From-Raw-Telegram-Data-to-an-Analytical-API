@@ -1,0 +1,7 @@
+version: 2
+sources:
+  - name: raw_telegram
+    database: telegram_db # The name of your database
+    schema: raw_telegram   # The schema you loaded data into
+    tables:
+      - name: messages
