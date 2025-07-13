@@ -1,181 +1,170 @@
 # Shipping a Data Product From Raw Telegram Data to an Analytical API
 
-## Project Overview
+## 🚀 Project Overview
 
 This repository contains an end-to-end data pipeline built for **Kara Solutions**. The primary goal is to process raw data scraped from public Telegram channels related to Ethiopian medical businesses and transform it into a clean, structured, and queryable format.
 
 The project addresses key business questions such as identifying top medical products, tracking price variations, and analyzing channel activity trends. This is achieved by implementing a modern **ELT (Extract, Load, Transform)** framework that converts unstructured Telegram data into a dimensional star schema, ready for analysis.
 
 The pipeline leverages a modern data stack:
+
 - **Docker** for running a reproducible PostgreSQL database instance.
 - **Telethon** for scraping raw message and image data from Telegram.
 - **PostgreSQL** as a robust data warehouse.
 - **dbt (Data Build Tool)** for reliable, modular, and test-driven data transformation.
 
-This README provides a comprehensive guide to setting up the environment, understanding the project structure, and running the data pipeline from your local machine.
-
-## Table of Contents
-1.  [Project Structure](#project-structure)
-2.  [Technical Stack](#technical-stack)
-3.  [Setup and Installation (Local)](#setup-and-installation-local)
-4.  [Running the Pipeline (Local)](#running-the-pipeline-local)
-5.  [Pipeline Stage Details](#pipeline-stage-details)
-    - [Task 1: Data Scraping & Collection](#task-1-data-scraping--collection-extract--load)
-    - [Task 2: Data Transformation & Modeling](#task-2-data-modeling-and-transformation-transform)
-6.  [Data Warehouse Schema](#data-warehouse-schema)
+> ✅ This project strictly follows dbt best practices, including well-structured staging and mart models, documented sources, and custom data quality tests located at `telegram_analytics/tests/generic/assert_positive_value.sql`.
 
 ---
-## Project Structure
 
-The project follows a modular structure to ensure clarity and maintainability.
-
+## 📁 Project Structure
 
 ethiopian-medical-analytics/
 ├── data/
-│   └── raw/
-│       ├── images/                     # Stores downloaded images by date and channel
-│       └── telegram_messages/          # Stores raw JSONL messages by date and channel
+│ └── raw/
+│ ├── images/ # Stores downloaded images by date and channel
+│ └── telegram_messages/ # Stores raw JSONL messages by date and channel
 ├── src/
-│   ├── load_raw_data.py                # Script to load raw JSONL into PostgreSQL
-│   └── telegram_scraper.py             # Script to scrape data from Telegram channels
-├── telegram_analytics/                 # The dbt project for data transformation
-│   ├── models/
-│   │   ├── staging/                    # Staging models for cleaning and casting
-│   │   │   ├── stg_telegram_messages.sql
-│   │   │   └── sources.yml
-│   │   └── marts/                      # Final dimensional and fact tables
-│   │       ├── dim_channels.sql
-│   │       ├── dim_dates.sql
-│   │       └── fct_messages.sql
-│   ├── tests/
-│   │   └── generic/                    # Custom data tests
-│   │       └── assert_positive_value.sql
-│   └── dbt_project.yml
-├── .env.example                        # Template for environment variables
-├── .gitignore                          # Ensures secrets and local artifacts are not committed
-├── docker-compose.yml                  # Defines and configures the PostgreSQL service
-└── requirements.txt                    # Lists all Python dependencies
+│ ├── load_raw_data.py # Script to load raw JSONL into PostgreSQL
+│ └── telegram_scraper.py # Script to scrape data from Telegram channels
+├── telegram_analytics/ # dbt project directory
+│ ├── models/
+│ │ ├── staging/
+│ │ │ ├── stg_telegram_messages.sql
+│ │ │ └── sources.yml
+│ │ └── marts/
+│ │ ├── dim_channels.sql
+│ │ ├── dim_dates.sql
+│ │ └── fct_messages.sql
+│ ├── tests/
+│ │ └── generic/
+│ │ └── assert_positive_value.sql
+│ └── dbt_project.yml
+├── .env.example # Template for environment variables
+├── .gitignore # Excludes secrets and local artifacts
+├── docker-compose.yml # PostgreSQL service configuration
+└── requirements.txt # Python dependencies
+
+yaml
+Copy
+Edit
 
 ---
-## Technical Stack
 
-| Component      | Technology                                    | Purpose                                                                                |
-| :------------- | :-------------------------------------------- | :------------------------------------------------------------------------------------- |
-| **Database** | **Docker & PostgreSQL** | To run a consistent, containerized database instance.                                  |
-| **Scraping** | **Python & Telethon** | To extract messages and images from public Telegram channels.                          |
-| **Data Lake** | **Local File System (JSONL)** | To store raw, unaltered data in a partitioned directory structure.                     |
-| **Transform** | **dbt (Data Build Tool)** | To clean, model, and test the data inside the warehouse, creating a reliable star schema.|
+## 🛠 Technical Stack
+
+| Component      | Technology                                    | Purpose                                                                                 |
+|----------------|-----------------------------------------------|-----------------------------------------------------------------------------------------|
+| **Database**   | **Docker + PostgreSQL**                       | Runs a consistent, containerized PostgreSQL instance                                   |
+| **Scraping**   | **Python + Telethon**                         | Extracts messages and images from public Telegram channels                             |
+| **Data Lake**  | **Local File System (JSONL)**                 | Stores raw, unaltered data in a partitioned directory structure                        |
+| **Transform**  | **dbt (Data Build Tool)**                     | Cleans, models, and tests the data using SQL-based transformations and assertions      |
 
 ---
-## Setup and Installation (Local)
 
-Follow these steps to set up the project environment on your local machine.
+## ⚙️ Setup and Installation (Local)
 
 ### 1. Prerequisites
-- Docker & Docker Compose installed and running on your machine.
-- Git installed on your machine.
-- Python 3.9+ installed on your machine.
-- A Telegram account with API credentials.
+
+- Docker & Docker Compose
+- Git
+- Python 3.9+
+- Telegram API credentials
 
 ### 2. Clone the Repository
+
 ```bash
 git clone https://github.com/matos-coder/Shipping-a-Data-Product-From-Raw-Telegram-Data-to-an-Analytical-API
-cd Shipping a Data Product From Raw Telegram Data to an Analytical API
-
+cd Shipping-a-Data-Product-From-Raw-Telegram-Data-to-an-Analytical-API
 3. Configure Environment Variables
-Create a .env file to store your secrets. A template is provided.
-
-Create the .env file:
-
+bash
+Copy
+Edit
 cp .env.example .env
+Edit .env and add your:
 
-Edit the .env file with your credentials. This file is included in .gitignore and will never be committed to version control.
+Telegram API credentials (telegram_app_id, telegram_api_hash)
 
-# Telegram API credentials from my.telegram.org
-telegram_app_id="YOUR_TELEGRAM_APP_ID"
-telegram_api_hash="YOUR_TELEGRAM_API_HASH"
+PostgreSQL credentials (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB)
 
-# PostgreSQL credentials (you can define these yourself)
-POSTGRES_USER=myuser
-POSTGRES_PASSWORD=mysecretpassword
-POSTGRES_DB=telegram_db
+🔐 Your .env is already git-ignored for security.
 
-4. Start the PostgreSQL Database
-This command uses Docker to start the PostgreSQL database container in the background. Your local Python scripts will connect to this database.
-
+4. Start PostgreSQL with Docker
+bash
+Copy
+Edit
 docker-compose up -d db
-
-Note: We are only starting the db service defined in docker-compose.yml.
-
-5. Set Up a Local Python Environment
-Create and activate a virtual environment to manage project dependencies locally.
-
-For Windows:
-
+5. Set Up Local Python Environment
+bash
+Copy
+Edit
 python -m venv .venv
-.venv\Scripts\activate
-
-For macOS/Linux:
-
-python3 -m venv .venv
-source .venv/bin/activate
-
-6. Install Dependencies
-Install all required Python libraries into your virtual environment.
-
+.venv\Scripts\activate  # On Windows
+# OR
+source .venv/bin/activate  # On macOS/Linux
+6. Install Python Dependencies
+bash
+Copy
+Edit
 pip install -r requirements.txt
-
-Running the Pipeline (Local)
-The pipeline is executed in three main steps from your local terminal.
-
+📡 Running the Pipeline (Local)
 Step 1: Scrape Raw Data
-Ensure your virtual environment is activated. This script connects to Telegram, scrapes data, and populates the data/raw directory.
-
+bash
+Copy
+Edit
 python src/telegram_scraper.py
+Saves .jsonl messages and images under data/raw/YYYY-MM-DD/channel_name/.
 
-Step 2: Load Raw Data into the Warehouse
-This script loads the raw JSONL files from the data lake into the PostgreSQL database running in Docker.
-
+Step 2: Load to PostgreSQL
+bash
+Copy
+Edit
 python src/load_raw_data.py
+Loads all .jsonl into the raw_telegram.messages table as JSONB.
 
-Step 3: Transform Data with dbt
-These commands navigate into the dbt project directory and execute the transformation and testing logic.
-
-# Enter the dbt project directory
+Step 3: Run dbt Transformations
+bash
+Copy
+Edit
 cd telegram_analytics
+dbt run       # Transforms data (staging → marts)
+dbt test      # Validates with built-in and custom tests
+🧪 Custom test assert_positive_value.sql ensures numeric fields meet logical business rules.
 
-# Run all transformation models (staging -> marts)
-dbt run
+🔄 Pipeline Stage Details
+✅ Task 1: Data Scraping & Collection (Extract & Load)
+Script: src/telegram_scraper.py
 
-# Run all data quality tests
-dbt test
+Output: data/raw/telegram_messages/YYYY-MM-DD/channel.jsonl
 
-After these steps, your PostgreSQL data warehouse will contain the clean, modeled data.
+Logging: Robust logging with fallback for rate limits
 
-Pipeline Stage Details
-Task 1: Data Scraping & Collection (Extract & Load)
-Objective: To extract raw data from Telegram and store it in a structured data lake.
+Error Handling: Skips malformed entries, logs issues
 
-Implementation: The src/telegram_scraper.py script uses the Telethon library to connect to the Telegram API and download messages and images.
+Images: Saved under data/raw/images/
 
-Data Lake Structure: Raw data is stored in a partitioned directory structure data/raw/telegram_messages/YYYY-MM-DD/channel_name.jsonl to facilitate incremental processing. This ensures the raw data remains the unaltered source of truth.
+✅ Task 2: Data Modeling and Transformation (Transform)
+Tool: dbt
 
-Logging & Error Handling: The script implements robust logging to track which channels and dates have been processed and to capture any API errors or rate-limiting issues, ensuring reliable execution.
+Staging Models: Casts JSONB fields into typed SQL columns
 
-Task 2: Data Modeling and Transformation (Transform)
-Objective: To transform the raw JSON data into a clean, tested, and query-optimized star schema using dbt.
+Mart Models: Aggregates messages by date/channel
 
-Staging Models: Models in models/staging perform the initial cleaning. They select fields from the raw JSONB data, cast data types correctly, and rename columns for clarity.
+Tests: Includes dbt's built-in + assert_positive_value.sql
 
-Data Mart Models: Models in models/marts build the final analytical tables by joining staging models. This creates a dimensional star schema optimized for analysis.
+✅ Schema is organized into a star schema (facts & dimensions).
 
-Data Testing: The project uses dbt's built-in tests (unique, not_null) to validate primary keys and a custom test (assert_positive_value) to enforce business rules, ensuring data integrity and trust.
+🧱 Data Warehouse Schema
+Table	Description
+fct_messages	Fact table for messages + metrics (views, text length)
+dim_channels	Channel metadata
+dim_dates	Calendar-based date dimension
 
-Data Warehouse Schema
-The final data warehouse is designed as a Star Schema to enable efficient analytical queries. This design separates quantitative data (facts) from descriptive attributes (dimensions).
+📌 Final Notes
+✅ dbt best practices followed: modular models, schema.yml, and tests
 
-fct_messages: The central fact table, with one row per message. It contains foreign keys to the dimension tables and key metrics like view_count and message_length.
+✅ Secrets handled via .env and excluded from git
 
-dim_channels: A dimension table holding information about each Telegram channel.
+✅ Reproducible setup with Docker
 
-dim_dates: A dimension table for powerful time-based analysis, allowing grouping by day, week, month, etc.
+✅ Documented and clean project layout
