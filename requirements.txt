@@ -8,6 +8,5 @@ dbt-postgres
 ultralytics
 
 "fastapi[all]" 
-uvicorn
 psycopg2-binary 
 sqlalchemy
