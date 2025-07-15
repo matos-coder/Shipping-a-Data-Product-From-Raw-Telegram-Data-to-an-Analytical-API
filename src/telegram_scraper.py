@@ -84,8 +84,11 @@ async def scrape_channel(client: TelegramClient, channel_url: str, base_data_pat
         # b) Collect images for object detection 
         if message.photo:
             try:
-                # Download media to the structured image directory
-                photo_path = await client.download_media(message.photo, file=image_path)
+                new_filename = f"{message.id}.jpg"
+                # Construct the full path for the new file
+                photo_path = os.path.join(image_path, new_filename)
+                # Download the media and save it to the specified path
+                await client.download_media(message.photo, file=photo_path)
                 print(f"Saved image from message {message.id} to {photo_path}")
             except Exception as e:
                 print(f"Failed to download photo from message {message.id}. Error: {e}")
