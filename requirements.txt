@@ -10,3 +10,6 @@ ultralytics
 "fastapi[all]" 
 psycopg2-binary 
 sqlalchemy
+
+dagster
+dagster-webserver
