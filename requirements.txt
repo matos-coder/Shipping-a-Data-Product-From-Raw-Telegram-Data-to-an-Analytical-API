@@ -4,3 +4,9 @@ telethon
 python-dotenv
 psycopg2-binary
 dbt-postgres
+
+ultralytics
+
+"fastapi[all]" 
+psycopg2-binary 
+sqlalchemy
