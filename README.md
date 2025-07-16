@@ -153,18 +153,84 @@ Mart Models: Aggregates messages by date/channel
 Tests: Includes dbt's built-in + assert_positive_value.sql
 
 ✅ Schema is organized into a star schema (facts & dimensions).
+🛠️ Task 3: Data Enrichment with YOLO (Image Object Detection)
 
-🧱 Data Warehouse Schema
-Table	Description
-fct_messages	Fact table for messages + metrics (views, text length)
-dim_channels	Channel metadata
-dim_dates	Calendar-based date dimension
+Used YOLOv8 from the ultralytics package to detect objects in scraped images.
+
+Script src/run_yolo_enrichment.py scans all scraped image directories.
+
+Detection results are saved in a new fact table fct_image_detections with keys:
+
+message_id, detected_object_name, confidence_score, and bounding_box_xyxy
+
+The new model is integrated into the telegram_analytics dbt project and linked to fct_messages for analytical insights.
+
+📈 Task 4: Build an Analytical API (FastAPI)
+
+Created a REST API using FastAPI and Uvicorn to expose analytics endpoints.
+
+Organized into modular files:
+
+main.py, database.py, models.py, schemas.py, and crud.py
+
+Endpoints:
+
+GET /api/reports/top-products?limit=10: Returns most frequently mentioned products
+
+GET /api/channels/{channel_name}/activity: Shows posting frequency per day
+
+GET /api/search/messages?query=paracetamol: Full-text search across messages
+
+Responses are validated using Pydantic schemas.
+
+🌍 Task 5: Pipeline Orchestration (Dagster)
+
+Used Dagster to create a production-ready, observable ELT pipeline.
+
+Defined @job in src/orchestration/pipeline.py with the following @ops:
+
+scrape_telegram_data_op
+
+load_raw_to_postgres_op
+
+run_dbt_transformations_op
+
+run_yolo_enrichment_op
+
+Launched with dagster dev and monitored via the local UI.
+
+Scheduled the pipeline using Dagster’s ScheduleDefinition to run every 24 hours.
+
+📊 Data Warehouse Schema
+
+Table
+
+Description
+
+fct_messages
+
+Fact table for messages + metrics (views, message length, etc.)
+
+dim_channels
+
+Dimension table with metadata about Telegram channels
+
+dim_dates
+
+Standard date dimension for time-based analysis
+
+fct_image_detections
+
+Object detections per message with class names + confidence
 
 📌 Final Notes
+
 ✅ dbt best practices followed: modular models, schema.yml, and tests
 
-✅ Secrets handled via .env and excluded from git
+✅ Secrets handled securely using .env and excluded from Git
 
-✅ Reproducible setup with Docker
+✅ Full pipeline reproducibility via Docker + Dagster
 
-✅ Documented and clean project layout
+✅ All components documented, modular, and production-ready
+
+✅ All required tasks (1–5) completed with high quality
