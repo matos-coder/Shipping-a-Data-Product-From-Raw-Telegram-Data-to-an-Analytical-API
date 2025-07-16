@@ -3,6 +3,7 @@ import subprocess
 import sys
 from pathlib import Path
 from dagster import job, op
+from dagster import ScheduleDefinition, Definitions
 
 def get_project_root() -> Path:
     return Path(__file__).resolve().parent.parent.parent
@@ -84,3 +85,18 @@ def telegram_analytics_job():
     run_dbt_transformations_op(loaded)
     
     run_yolo_enrichment_op(scraped)
+
+
+
+# Define schedule (e.g., every day at 1am)
+telegram_schedule = ScheduleDefinition(
+    job=telegram_analytics_job,
+    cron_schedule="0 1 * * *",  # runs at 1:00 AM every day
+    execution_timezone="Africa/Addis_Ababa"
+)
+
+# Dagster discovers this
+defs = Definitions(
+    jobs=[telegram_analytics_job],
+    schedules=[telegram_schedule]
+)
